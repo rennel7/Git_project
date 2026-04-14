@@ -35,6 +35,8 @@ Pour explorer le site localement, suivez ces étapes simples :
    git clone https://github.com/rennel7/Git_project.git
 2. **Acceder au fichier**
    cd Git_project
+
+   
 3.**Lancer l'application**
 Comme il s'agit d'un projet HTML/CSS/JS pur, vous pouvez simplement ouvrir le fichier index.html dans votre navigateur.
 
