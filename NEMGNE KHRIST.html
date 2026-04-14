@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🦷 Réservation & Disponibilités - Membre 3</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+    }
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: #f5f7fb;
+      padding: 2rem 1.5rem;
+      color: #1e293b;
+    }
+    h1 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      border-left: 5px solid #2563eb;
+      padding-left: 1rem;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 1.5rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.02), 0 2px 6px rgba(0,0,0,0.05);
+      border: 1px solid #e9eef4;
+      margin-bottom: 1.5rem;
+    }
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+      color: #334155;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid #d1d9e6;
+      border-radius: 14px;
+      font-size: 1rem;
+      transition: all 0.2s;
+      background: white;
+      margin-bottom: 1rem;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 6px -2px rgba(37,99,235,0.2);
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    button.secondary {
+      background: white;
+      color: #1e293b;
+      border: 1.5px solid #d1d9e6;
+      box-shadow: none;
+    }
+    button.secondary:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+    button.danger {
+      background: #ef4444;
+      color: white;
+    }
+    button.danger:hover {
+      background: #dc2626;
+    }
+    .creneaux-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin: 1.5rem 0 1rem;
+    }
+    .creneau-btn {
+      width: auto;
+      padding: 0.6rem 1.2rem;
+      background: #f1f5f9;
+      color: #1e293b;
+      border: 1px solid #e2e8f0;
+      border-radius: 40px;
+      font-weight: 500;
+      margin: 0;
+    }
+    .creneau-btn.selected {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+    }
+    .reservation-item {
+      background: #fafcff;
+      border-radius: 16px;
+      padding: 1rem;
+      margin-bottom: 0.8rem;
+      border: 1px solid #eef2f6;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .badge {
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: #e2e8f0;
+    }
+    .badge.confirmee { background: #10b981; color: white; }
+    .badge.en_attente { background: #f59e0b; color: white; }
+    .badge.annulee { background: #ef4444; color: white; }
+    .badge.terminee { background: #6b7280; color: white; }
+    .flex-row {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+    }
+    .mt-2 { margin-top: 0.8rem; }
+    .text-sm { font-size: 0.9rem; color: #64748b; }
+    .error-message { color: #dc2626; margin-top: -0.5rem; margin-bottom: 1rem; font-size: 0.9rem; }
+    .success-message { color: #059669; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>
+    <span>📅</span> Système de réservation — Membre 3
+  </h1>
+
+  <!-- Sélecteur de rôle (simulation utilisateur) -->
+  <div class="card" style="padding: 1rem 1.5rem;">
+    <div class="flex-row" style="justify-content: space-between;">
+      <div><strong>Simulation d'utilisateur :</strong></div>
+      <select id="userRoleSelect" style="width: auto; margin:0;">
+        <option value="client" selected>👤 Client (moi)</option>
+        <option value="prestataire">🔧 Prestataire (Dr. Martin)</option>
+      </select>
+      <span id="currentUserIdDisplay" class="text-sm"></span>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- COLONNE GAUCHE : recherche et prise de RDV -->
+    <div>
+      <div class="card">
+        <h2>🔍 Choisir un prestataire</h2>
+        <label>Prestataire</label>
+        <select id="prestataireSelect">
+          <option value="prest_1">🦷 Dr. Sophie Martin (Dentiste)</option>
+          <option value="prest_2">🔧 Marc Dubois (Plombier)</option>
+          <option value="prest_3">🧹 Nettoyage Pro (Ménage)</option>
+        </select>
+
+        <label>Date du rendez-vous</label>
+        <input type="date" id="datePicker" min="" />
+
+        <button id="loadDispoBtn">✨ Voir les créneaux disponibles</button>
+
+        <div id="creneauxSection" style="display: none;">
+          <div style="font-weight: 500; margin: 1rem 0 0.5rem;">Horaires disponibles :</div>
+          <div id="creneauxList" class="creneaux-container"></div>
+          <div id="noCreneauxMsg" class="text-sm error-message" style="display: none;">Aucun créneau disponible à cette date.</div>
+
+          <label>Durée (minutes)</label>
+          <select id="dureeSelect">
+            <option value="30">30 min</option>
+            <option value="60" selected>1 heure</option>
+            <option value="90">1h30</option>
+            <option value="120">2 heures</option>
+          </select>
+
+          <label>Notes (optionnel)</label>
+          <input type="text" id="notesInput" placeholder="Ex: Urgence, précisions..." />
+
+          <button id="reserverBtn" class="mt-2">✅ Confirmer la réservation</button>
+          <div id="reservationMessage" class="success-message"></div>
+        </div>
+      </div>
+
+      <!-- Tableau de bord client : réservations -->
+      <div class="card">
+        <h2>📋 Mes réservations</h2>
+        <div class="flex-row" style="justify-content: space-between;">
+          <select id="filterReservations" style="width: auto;">
+            <option value="upcoming">À venir</option>
+            <option value="past">Passées</option>
+            <option value="all">Toutes</option>
+          </select>
+          <button id="refreshReservationsBtn" class="secondary" style="width: auto;">🔄 Actualiser</button>
+        </div>
+        <div id="reservationsListContainer" style="margin-top: 1rem;">
+          <!-- Liste dynamique -->
+        </div>
+      </div>
+    </div>
+
+    <!-- COLONNE DROITE : disponibilités prestataire (vue prestataire) -->
+    <div>
+      <div class="card">
+        <h2>⚙️ Gestion des disponibilités (vue prestataire)</h2>
+        <div id="prestataireDispoPanel">
+          <label>Définir créneaux récurrents</label>
+          <div id="creneauxRecurringEditor" style="margin-bottom: 1rem;">
+            <!-- généré en js -->
+          </div>
+          <button id="saveDispoBtn">💾 Enregistrer les disponibilités</button>
+          <div id="dispoSaveMsg" class="success-message"></div>
+
+          <hr style="margin: 1.5rem 0; border-top: 1px dashed #ccc;">
+          <h3 style="font-size: 1.1rem;">📊 Réservations du prestataire</h3>
+          <div id="prestataireAgenda"></div>
+        </div>
+        <div id="notPrestataireMsg" class="text-sm" style="color: #64748b;">
+          Passez en mode "Prestataire" pour gérer vos disponibilités.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    "use strict";
+
+    // ---------- DONNÉES MOCKÉES (simulation base de données) ----------
+    const mockUsers = {
+      client1: { id: 'client1', nom: 'Jean Dupont', role: 'client' },
+      prest_1: { id: 'prest_1', nom: 'Sophie Martin', role: 'prestataire', specialite: 'Dentiste' },
+      prest_2: { id: 'prest_2', nom: 'Marc Dubois', role: 'prestataire', specialite: 'Plombier' },
+      prest_3: { id: 'prest_3', nom: 'Nettoyage Pro', role: 'prestataire', specialite: 'Ménage' },
+    };
+
+    // Disponibilités mockées par prestataire
+    let disponibilitesStore = {
+      prest_1: {
+        creneaux: [
+          { jour: 'lundi', debut: '09:00', fin: '12:00' },
+          { jour: 'lundi', debut: '14:00', fin: '18:00' },
+          { jour: 'mercredi', debut: '10:00', fin: '16:00' },
+          { jour: 'vendredi', debut: '09:00', fin: '17:00' }
+        ],
+        dureeRdv: 60,
+        conges: [] // dates ISO
+      },
+      prest_2: {
+        creneaux: [
+          { jour: 'mardi', debut: '08:00', fin: '12:00' },
+          { jour: 'jeudi', debut: '13:00', fin: '19:00' }
+        ],
+        dureeRdv: 60,
+        conges: []
+      },
+      prest_3: {
+        creneaux: [
+          { jour: 'lundi', debut: '08:00', fin: '20:00' },
+          { jour: 'mercredi', debut: '08:00', fin: '20:00' },
+          { jour: 'vendredi', debut: '08:00', fin: '20:00' }
+        ],
+        dureeRdv: 120,
+        conges: []
+      }
+    };
+
+    // Réservations mockées
+    let reservationsStore = [
+      { id: 'r1', clientId: 'client1', prestataireId: 'prest_1', date: new Date(Date.now() + 2*24*60*60*1000), duree: 60, statut: 'confirmee', notes: 'Détartrage' },
+      { id: 'r2', clientId: 'client1', prestataireId: 'prest_2', date: new Date(Date.now() - 3*24*60*60*1000), duree: 90, statut: 'terminee', notes: 'Fuite évier' },
+      { id: 'r3', clientId: 'client1', prestataireId: 'prest_1', date: new Date(Date.now() + 5*24*60*60*1000), duree: 30, statut: 'en_attente', notes: 'Contrôle' },
+    ];
+
+    // ID de l'utilisateur courant (client par défaut)
+    let currentUser = { ...mockUsers.client1 };
+
+    // ---------- HELPERS ----------
+    function formatDateHeure(date) {
+      return new Date(date).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+    }
+
+    function getJourSemaine(date) {
+      const jours = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+      return jours[date.getDay()];
+    }
+
+    function formatHeure(date) {
+      return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // Vérifie conflit entre créneaux
+    function chevauche(debut1, fin1, debut2, fin2) {
+      return debut1 < fin2 && fin1 > debut2;
+    }
+
+    // ---------- LOGIQUE DISPONIBILITÉS ----------
+    function getCreneauxDisponibles(prestataireId, dateStr) {
+      const dispo = disponibilitesStore[prestataireId];
+      if (!dispo) return [];
+
+      const date = new Date(dateStr);
+      date.setHours(0,0,0,0);
+      const jour = getJourSemaine(date);
+      
+      // Vérifier congés
+      if (dispo.conges.some(c => new Date(c).toDateString() === date.toDateString())) {
+        return [];
+      }
+
+      const creneauJour = dispo.creneaux.find(c => c.jour === jour);
+      if (!creneauJour) return [];
+
+      const dureeRdv = dispo.dureeRdv || 60;
+      const [debutH, debutM] = creneauJour.debut.split(':').map(Number);
+      const [finH, finM] = creneauJour.fin.split(':').map(Number);
+
+      const debutJour = new Date(date);
+      debutJour.setHours(debutH, debutM, 0);
+      const finJour = new Date(date);
+      finJour.setHours(finH, finM, 0);
+
+      const creneauxPossibles = [];
+      let current = new Date(debutJour);
+      while (new Date(current.getTime() + dureeRdv*60000) <= finJour) {
+        creneauxPossibles.push(new Date(current));
+        current = new Date(current.getTime() + dureeRdv*60000);
+      }
+
+      // Filtrer avec réservations existantes non annulées
+      const reservationsJour = reservationsStore.filter(r => 
+        r.prestataireId === prestataireId &&
+        r.statut !== 'annulee' &&
+        new Date(r.date).toDateString() === date.toDateString()
+      );
+
+      return creneauxPossibles.filter(debut => {
+        const fin = new Date(debut.getTime() + dureeRdv*60000);
+        return !reservationsJour.some(res => {
+          const debutRes = new Date(res.date);
+          const finRes = new Date(debutRes.getTime() + (res.duree || 60)*60000);
+          return chevauche(debut, fin, debutRes, finRes);
+        });
+      });
+    }
+
+    // ---------- RENDU INTERFACE ----------
+    const userRoleSelect = document.getElementById('userRoleSelect');
+    const currentUserIdDisplay = document.getElementById('currentUserIdDisplay');
+    const prestataireSelect = document.getElementById('prestataireSelect');
+    const datePicker = document.getElementById('datePicker');
+    const loadDispoBtn = document.getElementById('loadDispoBtn');
+    const creneauxSection = document.getElementById('creneauxSection');
+    const creneauxList = document.getElementById('creneauxList');
+    const noCreneauxMsg = document.getElementById('noCreneauxMsg');
+    const reserverBtn = document.getElementById('reserverBtn');
+    const reservationMessage = document.getElementById('reservationMessage');
+    const dureeSelect = document.getElementById('dureeSelect');
+    const notesInput = document.getElementById('notesInput');
+    const filterReservations = document.getElementById('filterReservations');
+    const refreshReservationsBtn = document.getElementById('refreshReservationsBtn');
+    const reservationsListContainer = document.getElementById('reservationsListContainer');
+    const prestataireDispoPanel = document.getElementById('prestataireDispoPanel');
+    const notPrestataireMsg = document.getElementById('notPrestataireMsg');
+    const creneauxRecurringEditor = document.getElementById('creneauxRecurringEditor');
+    const saveDispoBtn = document.getElementById('saveDispoBtn');
+    const dispoSaveMsg = document.getElementById('dispoSaveMsg');
+    const prestataireAgenda = document.getElementById('prestataireAgenda');
+
+    let selectedCreneau = null;
+
+    // Initialisation datePicker min = aujourd'hui
+    const today = new Date().toISOString().split('T')[0];
+    datePicker.min = today;
+    datePicker.value = today;
+
+    function updateUIForRole() {
+      const role = currentUser.role;
+      if (role === 'prestataire') {
+        prestataireDispoPanel.style.display = 'block';
+        notPrestataireMsg.style.display = 'none';
+        renderDispoEditor();
+        renderPrestataireAgenda();
+      } else {
+        prestataireDispoPanel.style.display = 'none';
+        notPrestataireMsg.style.display = 'block';
+      }
+      currentUserIdDisplay.textContent = `${currentUser.nom} (${currentUser.role})`;
+      renderMesReservations();
+    }
+
+    userRoleSelect.addEventListener('change', (e) => {
+      if (e.target.value === 'client') {
+        currentUser = { ...mockUsers.client1 };
+      } else {
+        currentUser = { ...mockUsers.prest_1 };
+      }
+      updateUIForRole();
+    });
+
+    // Rendu éditeur de disponibilités pour prestataire
+    function renderDispoEditor() {
+      const prestaId = currentUser.id;
+      const dispo = disponibilitesStore[prestaId] || { creneaux: [], dureeRdv: 60 };
+      const jours = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+      let html = '';
+      jours.forEach(jour => {
+        const creneauExist = dispo.creneaux.find(c => c.jour === jour);
+        html += `<div style="display:flex; gap:0.5rem; margin-bottom:0.5rem; align-items:center;">
+          <span style="width:90px; font-weight:500;">${jour}</span>
+          <input type="time" id="debut_${jour}" value="${creneauExist?.debut || '09:00'}" style="width:120px; margin:0;">
+          <span>à</span>
+          <input type="time" id="fin_${jour}" value="${creneauExist?.fin || '17:00'}" style="width:120px; margin:0;">
+          <label style="display:flex; align-items:center; margin:0 0 0 10px;"><input type="checkbox" id="active_${jour}" ${creneauExist ? 'checked' : ''}> Actif</label>
+        </div>`;
+      });
+      html += `<label style="margin-top:1rem;">Durée par défaut des RDV (minutes)</label>
+        <input type="number" id="dureeRdvInput" value="${dispo.dureeRdv}" min="15" step="15" style="width:120px;">`;
+      creneauxRecurringEditor.innerHTML = html;
+    }
+
+    saveDispoBtn.addEventListener('click', () => {
+      if (currentUser.role !== 'prestataire') return;
+      const prestaId = currentUser.id;
+      const jours = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+      const newCreneaux = [];
+      jours.forEach(jour => {
+        const active = document.getElementById(`active_${jour}`)?.checked;
+        if (active) {
+          const debut = document.getElementById(`debut_${jour}`).value;
+          const fin = document.getElementById(`fin_${jour}`).value;
+          newCreneaux.push({ jour, debut, fin });
+        }
+      });
+      const duree = parseInt(document.getElementById('dureeRdvInput').value, 10);
+      disponibilitesStore[prestaId] = {
+        ...disponibilitesStore[prestaId],
+        creneaux: newCreneaux,
+        dureeRdv: duree || 60,
+        conges: disponibilitesStore[prestaId]?.conges || []
+      };
+      dispoSaveMsg.textContent = '✅ Disponibilités enregistrées !';
+      setTimeout(() => dispoSaveMsg.textContent = '', 2000);
+    });
+
+    function renderPrestataireAgenda() {
+      const prestaId = currentUser.id;
+      const resas = reservationsStore.filter(r => r.prestataireId === prestaId).sort((a,b) => new Date(a.date) - new Date(b.date));
+      if (resas.length === 0) {
+        prestataireAgenda.innerHTML = '<p class="text-sm">Aucune réservation pour le moment.</p>';
+        return;
+      }
+      let html = '';
+      resas.slice(0, 10).forEach(r => {
+        const client = mockUsers[r.clientId] || { nom: 'Client inconnu' };
+        html += `<div class="reservation-item">
+          <div><strong>${client.nom}</strong><br><small>${formatDateHeure(r.date)} (${r.duree} min)</small></div>
+          <span class="badge ${r.statut}">${r.statut}</span>
+        </div>`;
+      });
+      prestataireAgenda.innerHTML = html;
+    }
+
+    // Charger créneaux disponibles
+    loadDispoBtn.addEventListener('click', () => {
+      const prestataireId = prestataireSelect.value;
+      const date = datePicker.value;
+      if (!date) return;
+
+      const creneaux = getCreneauxDisponibles(prestataireId, date);
+      creneauxSection.style.display = 'block';
+      creneauxList.innerHTML = '';
+      selectedCreneau = null;
+      reserverBtn.disabled = true;
+
+      if (creneaux.length === 0) {
+        noCreneauxMsg.style.display = 'block';
+      } else {
+        noCreneauxMsg.style.display = 'none';
+        creneaux.forEach(creneau => {
+          const btn = document.createElement('button');
+          btn.className = 'creneau-btn';
+          btn.textContent = formatHeure(creneau);
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.creneau-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedCreneau = creneau;
+            reserverBtn.disabled = false;
+          });
+          creneauxList.appendChild(btn);
+        });
+      }
+      reservationMessage.textContent = '';
+    });
+
+    // Réservation
+    reserverBtn.addEventListener('click', () => {
+      if (!selectedCreneau) return;
+      const prestataireId = prestataireSelect.value;
+      const duree = parseInt(dureeSelect.value, 10);
+      const notes = notesInput.value;
+
+      const newReservation = {
+        id: 'r_' + Date.now(),
+        clientId: currentUser.id,
+        prestataireId,
+        date: selectedCreneau,
+        duree,
+        statut: 'en_attente',
+        notes
+      };
+      reservationsStore.push(newReservation);
+      reservationMessage.textContent = '✅ Réservation effectuée avec succès !';
+      // Réafficher les créneaux mis à jour
+      loadDispoBtn.click();
+      renderMesReservations();
+      if (currentUser.role === 'prestataire') renderPrestataireAgenda();
+    });
+
+    function renderMesReservations() {
+      const filter = filterReservations.value;
+      let resas = reservationsStore.filter(r => r.clientId === currentUser.id);
+      const now = new Date();
+      
+      if (filter === 'upcoming') {
+        resas = resas.filter(r => new Date(r.date) >= now && r.statut !== 'annulee' && r.statut !== 'terminee');
+      } else if (filter === 'past') {
+        resas = resas.filter(r => new Date(r.date) < now || r.statut === 'terminee' || r.statut === 'annulee');
+      }
+      resas.sort((a,b) => new Date(a.date) - new Date(b.date));
+
+      if (resas.length === 0) {
+        reservationsListContainer.innerHTML = '<p class="text-sm">Aucune réservation.</p>';
+        return;
+      }
+
+      let html = '';
+      resas.forEach(r => {
+        const presta = mockUsers[r.prestataireId] || { nom: 'Prestataire' };
+        html += `<div class="reservation-item">
+          <div>
+            <strong>${presta.nom}</strong><br>
+            <small>${formatDateHeure(r.date)} · ${r.duree} min</small><br>
+            ${r.notes ? `<small>📝 ${r.notes}</small>` : ''}
+          </div>
+          <div style="display:flex; gap:0.5rem; align-items:center;">
+            <span class="badge ${r.statut}">${r.statut}</span>
+            ${r.statut === 'en_attente' ? `<button class="secondary" style="width:auto; margin:0;" onclick="window.cancelReservation('${r.id}')">Annuler</button>` : ''}
+          </div>
+        </div>`;
+      });
+      reservationsListContainer.innerHTML = html;
+    }
+
+    window.cancelReservation = function(resId) {
+      const reservation = reservationsStore.find(r => r.id === resId);
+      if (reservation && reservation.clientId === currentUser.id) {
+        reservation.statut = 'annulee';
+        renderMesReservations();
+        if (currentUser.role === 'prestataire') renderPrestataireAgenda();
+      }
+    };
+
+    filterReservations.addEventListener('change', renderMesReservations);
+    refreshReservationsBtn.addEventListener('click', renderMesReservations);
+
+    // Initialisation
+    updateUIForRole();
+    renderMesReservations();
+
+    // Mise à jour auto du panneau prestataire si role change
+  })();
+</script>
+</body>
+</html>
