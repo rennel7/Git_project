@@ -13,15 +13,15 @@ const reservationSchema = new mongoose.Schema({
   },
   serviceId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Service', // optionnel, si les prestataires proposent plusieurs services
+    ref: 'Service', 
     required: false
   },
   date: {
-    type: Date, // date complète (jour + heure)
+    type: Date, 
     required: true
   },
   duree: {
-    type: Number, // en minutes
+    type: Number, 
     default: 60
   },
   statut: {
