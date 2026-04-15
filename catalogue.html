@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Catalogue — ServEasy Cameroun</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <div class="logo">Serv<span>Easy</span></div>
+  <div class="nav-links">
+    <a href="index.html">Accueil</a>
+    <a href="catalogue.html" class="active">Catalogue</a>
+  </div>
+</nav>
+
+<!-- BARRE DE RECHERCHE CATALOGUE -->
+<div class="cat-searchbar">
+  <div class="cat-search-inner">
+    <div class="search-field sm">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="catQuery" placeholder="Métier, service…"/>
+    </div>
+    <div class="search-field sm">
+      <span class="search-icon">📍</span>
+      <select id="catVille">
+        <option value="">Toutes les villes</option>
+        <option>Yaoundé</option><option>Douala</option><option>Bafoussam</option>
+        <option>Bamenda</option><option>Garoua</option><option>Maroua</option>
+        <option>Ngaoundéré</option><option>Bertoua</option><option>Ebolowa</option>
+        <option>Kribi</option><option>Kumba</option><option>Buea</option>
+        <option>Limbe</option><option>Edéa</option><option>Nkongsamba</option>
+        <option>Dschang</option><option>Foumban</option><option>Sangmélima</option>
+        <option>Mbalmayo</option><option>Obala</option><option>Tibati</option>
+        <option>Meiganga</option><option>Guider</option><option>Kaélé</option>
+      </select>
+    </div>
+    <button class="btn-hero-search sm" onclick="renderCards()">Chercher</button>
+  </div>
+</div>
+
+<!-- CORPS DU CATALOGUE -->
+<div class="catalogue-layout">
+
+  <!-- SIDEBAR FILTRES -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">Catégorie</div>
+      <div class="cat-list" id="catList"></div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Disponibilité</div>
+      <label class="radio-opt">
+        <input type="radio" name="dispo" value="" checked onchange="setDispo('')"/> Tous
+      </label>
+      <label class="radio-opt">
+        <input type="radio" name="dispo" value="libre" onchange="setDispo('libre')"/> ✅ Disponibles
+      </label>
+      <label class="radio-opt">
+        <input type="radio" name="dispo" value="occupe" onchange="setDispo('occupe')"/> 🔴 Occupés
+      </label>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Note minimale</div>
+      <div class="note-filters">
+        <button class="note-btn active" onclick="setNote(this,0)">Toutes</button>
+        <button class="note-btn" onclick="setNote(this,4)">4★+</button>
+        <button class="note-btn" onclick="setNote(this,4.5)">4.5★+</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CONTENU PRINCIPAL -->
+  <main class="main-content">
+    <div class="result-header">
+      <div class="result-info" id="resultInfo">Chargement…</div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </main>
+</div>
+
+<!-- MODAL RÉSERVATION -->
+<div class="overlay" id="overlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>📅 Réserver un créneau</h2>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-info" id="modal-info"></div>
+      <div class="form-group">
+        <label>Votre nom complet *</label>
+        <input type="text" id="inputNom" placeholder="Ex : Jean Dupont"/>
+      </div>
+      <div class="form-group">
+        <label>Numéro de téléphone *</label>
+        <input type="tel" id="inputTel" placeholder="Ex : 699 000 000"/>
+      </div>
+      <div class="form-group">
+        <label>Date souhaitée *</label>
+        <input type="date" id="inputDate"/>
+      </div>
+      <div class="form-group">
+        <label>Motif / Note (optionnel)</label>
+        <textarea id="inputNote" placeholder="Décrivez votre besoin…"></textarea>
+      </div>
+      <button class="btn-confirm" onclick="confirmerReservation()">Confirmer la réservation</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="logo" style="font-size:1.3rem">Serv<span>Easy</span></div>
+    <p>© 2025 ServEasy — Cameroun 🇨🇲</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script>
+  // Lire les paramètres URL à l'arrivée sur la page
+  document.addEventListener('DOMContentLoaded', function() {
+    var params = new URLSearchParams(window.location.search);
+    var q    = params.get('q')    || '';
+    var v    = params.get('ville')|| '';
+    var cat  = params.get('cat') || 'all';
+
+    if (q) document.getElementById('catQuery').value = q;
+    if (v) document.getElementById('catVille').value = v;
+
+    initCats(cat);
+    renderCards();
+
+    var today = new Date().toISOString().split('T')[0];
+    document.getElementById('inputDate').min = today;
+
+    document.getElementById('catQuery').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') renderCards();
+    });
+  });
+</script>
+</body>
+</html>

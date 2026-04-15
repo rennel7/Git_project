@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ServEasy Cameroun — Réservez vos prestataires</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <div class="logo">Serv<span>Easy</span></div>
+  <div class="nav-links">
+    <a href="index.html" class="active">Accueil</a>
+    <a href="catalogue.html">Catalogue</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">🇨🇲 Disponible partout au Cameroun</div>
+    <h1>Trouvez et réservez<br>votre <em>prestataire</em><br>en quelques clics</h1>
+    <p>Dentiste, esthéticienne, gynécologue, plombier, chauffeur… Trouvez le bon professionnel dans votre ville et réservez votre créneau instantanément.</p>
+
+    <!-- BARRE DE RECHERCHE PRINCIPALE -->
+    <div class="hero-search">
+      <div class="search-field">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="heroQuery" placeholder="Quel service cherchez-vous ?"/>
+      </div>
+      <div class="search-divider"></div>
+      <div class="search-field">
+        <span class="search-icon">📍</span>
+        <select id="heroVille">
+          <option value="">Toutes les villes</option>
+          <option>Yaoundé</option><option>Douala</option><option>Bafoussam</option>
+          <option>Bamenda</option><option>Garoua</option><option>Maroua</option>
+          <option>Ngaoundéré</option><option>Bertoua</option><option>Ebolowa</option>
+          <option>Kribi</option><option>Kumba</option><option>Buea</option>
+          <option>Limbe</option><option>Edéa</option><option>Nkongsamba</option>
+          <option>Dschang</option><option>Foumban</option><option>Sangmélima</option>
+          <option>Mbalmayo</option><option>Obala</option><option>Tibati</option>
+          <option>Meiganga</option><option>Guider</option><option>Kaélé</option>
+        </select>
+      </div>
+      <button class="btn-hero-search" onclick="goSearch()">Rechercher</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="hero-stats">
+      <div class="stat"><strong>200+</strong><span>Prestataires</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat"><strong>30+</strong><span>Métiers</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat"><strong>24</strong><span>Villes</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CATÉGORIES RAPIDES -->
+<section class="section-cats">
+  <h2 class="section-h2">Parcourir par catégorie</h2>
+  <div class="cat-grid">
+    <a href="catalogue.html?cat=sante" class="cat-card">
+      <div class="cat-icon">🏥</div>
+      <div class="cat-name">Santé</div>
+      <div class="cat-sub">Médecin, Dentiste, Gynécologue…</div>
+    </a>
+    <a href="catalogue.html?cat=beaute" class="cat-card">
+      <div class="cat-icon">💄</div>
+      <div class="cat-name">Beauté</div>
+      <div class="cat-sub">Esthéticienne, Coiffeuse, Maquillage…</div>
+    </a>
+    <a href="catalogue.html?cat=maison" class="cat-card">
+      <div class="cat-icon">🏠</div>
+      <div class="cat-name">Maison</div>
+      <div class="cat-sub">Plombier, Électricien, Ménage…</div>
+    </a>
+    <a href="catalogue.html?cat=transport" class="cat-card">
+      <div class="cat-icon">🚗</div>
+      <div class="cat-name">Transport</div>
+      <div class="cat-sub">Chauffeur, Taxi, Déménagement…</div>
+    </a>
+    <a href="catalogue.html?cat=education" class="cat-card">
+      <div class="cat-icon">📚</div>
+      <div class="cat-name">Éducation</div>
+      <div class="cat-sub">Professeur, Tuteur, Formation…</div>
+    </a>
+    <a href="catalogue.html?cat=juridique" class="cat-card">
+      <div class="cat-icon">⚖️</div>
+      <div class="cat-name">Juridique & Finance</div>
+      <div class="cat-sub">Avocat, Comptable, Notaire…</div>
+    </a>
+    <a href="catalogue.html?cat=sport" class="cat-card">
+      <div class="cat-icon">💪</div>
+      <div class="cat-name">Sport & Bien-être</div>
+      <div class="cat-sub">Coach, Nutritionniste, Yoga…</div>
+    </a>
+    <a href="catalogue.html?cat=evenement" class="cat-card">
+      <div class="cat-icon">🎉</div>
+      <div class="cat-name">Événements</div>
+      <div class="cat-sub">Photographe, Traiteur, DJ…</div>
+    </a>
+  </div>
+</section>
+
+<!-- COMMENT ÇA MARCHE -->
+<section class="section-how">
+  <h2 class="section-h2">Comment ça marche ?</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-icon">🔍</div>
+      <h3>Cherchez</h3>
+      <p>Entrez votre métier et votre ville. Le site trouve les prestataires disponibles.</p>
+    </div>
+    <div class="step-arrow">→</div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-icon">📅</div>
+      <h3>Choisissez</h3>
+      <p>Consultez les fiches, les horaires et choisissez le créneau qui vous convient.</p>
+    </div>
+    <div class="step-arrow">→</div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-icon">✅</div>
+      <h3>Réservez</h3>
+      <p>Confirmez votre rendez-vous en quelques secondes. C'est aussi simple que ça.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="logo" style="font-size:1.3rem">Serv<span>Easy</span></div>
+    <p>La plateforme de réservation de prestataires au Cameroun 🇨🇲</p>
+    <p style="margin-top:.5rem;font-size:.8rem">© 2025 ServEasy — Tous droits réservés</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script>
+  function goSearch() {
+    var q = document.getElementById('heroQuery').value.trim();
+    var v = document.getElementById('heroVille').value;
+    var url = 'catalogue.html';
+    var params = [];
+    if (q) params.push('q=' + encodeURIComponent(q));
+    if (v) params.push('ville=' + encodeURIComponent(v));
+    if (params.length) url += '?' + params.join('&');
+    window.location.href = url;
+  }
+  // Lancer la recherche avec la touche Entrée
+  document.getElementById('heroQuery').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') goSearch();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ServEasy — Notifications & Communication</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green-dark:  #1E4035;
+      --green-mid:   #2D6A4F;
+      --green-soft:  #52B788;
+      --green-light: #D8EFDF;
+      --green-pale:  #EEF7EE;
+      --cream:       #F5F2EC;
+      --cream-dark:  #E8E3DA;
+      --orange:      #E8572A;
+      --text-dark:   #1A2E25;
+      --text-mid:    #3D5A4C;
+      --text-muted:  #7A9080;
+      --white:       #FFFFFF;
+      --border:      #D4E6D8;
+      --red:         #D94F3D;
+      --red-bg:      #FDF0EE;
+      --blue:        #2E6EA6;
+      --blue-bg:     #EEF4FB;
+      --amber:       #B07D2B;
+      --amber-bg:    #FBF5E8;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--cream);
+      color: var(--text-dark);
+      min-height: 100vh;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 800;
+    }
+    .logo span:first-child { color: var(--green-dark); }
+    .logo .orange         { color: var(--orange); }
+
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color .15s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--green-dark); }
+
+    .nav-notif-btn {
+      position: relative;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+    }
+    .nav-notif-btn .dot {
+      position: absolute;
+      top: 0; right: 0;
+      width: 8px; height: 8px;
+      background: var(--orange);
+      border-radius: 50%;
+      border: 2px solid var(--white);
+    }
+
+    /* ── PAGE LAYOUT ── */
+    .page { max-width: 960px; margin: 0 auto; padding: 32px 24px 60px; }
+
+    .page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+    }
+    .page-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; }
+
+    /* ── CARD WRAPPER ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    /* ── SECTION HEADER ── */
+    .sec-header {
+      background: var(--green-dark);
+      padding: 22px 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .sec-icon {
+      width: 44px; height: 44px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      position: relative;
+    }
+    .sec-icon::after {
+      content: '';
+      position: absolute; top: 6px; right: 6px;
+      width: 8px; height: 8px;
+      background: var(--orange);
+      border-radius: 50%;
+      border: 2px solid var(--green-dark);
+    }
+
+    .sec-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 19px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .sec-sub { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
+      gap: 2px;
+      overflow-x: auto;
+    }
+
+    .tab {
+      padding: 13px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all .18s;
+      user-select: none;
+      white-space: nowrap;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .tab:hover { color: var(--text-dark); }
+    .tab.active { color: var(--green-dark); border-bottom-color: var(--green-dark); font-weight: 600; }
+
+    .badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-left: 5px;
+      background: var(--green-light);
+      color: var(--green-dark);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── TAGS ── */
+    .ntag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .02em;
+    }
+    .t-ok  { background: var(--green-light); color: var(--green-dark); }
+    .t-no  { background: var(--red-bg);      color: var(--red); }
+    .t-rem { background: var(--blue-bg);     color: var(--blue); }
+    .t-msg { background: var(--amber-bg);    color: var(--amber); }
+
+    /* ── NOTIFICATIONS ── */
+    .notif-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+      padding: 15px 24px;
+      background: var(--white);
+      border-bottom: 1px solid var(--green-pale);
+      cursor: pointer;
+      transition: background .12s;
+      position: relative;
+    }
+    .notif-item:hover { background: var(--green-pale); }
+    .notif-item.unread { background: #F0F9F2; }
+    .notif-item.unread::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--green-soft);
+      border-radius: 0 2px 2px 0;
+    }
+
+    .notif-ava {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .notif-ava .dot {
+      position: absolute; bottom: -2px; right: -2px;
+      width: 11px; height: 11px;
+      border-radius: 50%;
+      border: 2px solid var(--white);
+    }
+
+    .notif-body { flex: 1; min-width: 0; }
+    .notif-title {
+      font-size: 13px; font-weight: 600; color: var(--text-dark);
+      margin-bottom: 3px;
+      display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+    }
+    .notif-desc  { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+    .notif-time  { font-size: 11px; color: #aab8af; margin-top: 4px; }
+
+    /* ── MESSAGERIE ── */
+    .chat-layout {
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      height: 460px;
+    }
+
+    .chat-side {
+      border-right: 1px solid var(--border);
+      background: var(--white);
+      overflow-y: auto;
+    }
+
+    .chat-search { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    .chat-search input {
+      width: 100%;
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 12px;
+      color: var(--text-dark);
+      outline: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .chat-search input:focus { border-color: var(--green-soft); }
+    .chat-search input::placeholder { color: var(--text-muted); }
+
+    .conv {
+      padding: 11px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--green-pale);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      transition: background .12s;
+    }
+    .conv:hover  { background: var(--green-pale); }
+    .conv.active { background: var(--green-light); }
+
+    .conv-ava {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: var(--green-pale);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .conv-name { font-size: 13px; font-weight: 600; color: var(--text-dark); }
+    .conv-prev { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+    .conv-time { font-size: 10px; color: #bbb; }
+    .conv-unread {
+      width: 16px; height: 16px;
+      background: var(--green-dark);
+      border-radius: 50%;
+      font-size: 9px; font-weight: 700;
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      margin: 2px 0 0 auto;
+    }
+
+    .chat-main { display: flex; flex-direction: column; background: var(--cream); }
+
+    .chat-top {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+      background: var(--white);
+    }
+    .chat-top-name { font-size: 14px; font-weight: 600; color: var(--text-dark); }
+    .chat-top-role { font-size: 11px; color: var(--text-muted); }
+    .online-status {
+      font-size: 11px; color: var(--green-soft);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .online-status::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green-soft);
+      display: block;
+    }
+
+    .chat-msgs {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .msg { max-width: 76%; display: flex; flex-direction: column; }
+    .msg.sent { align-self: flex-end; align-items: flex-end; }
+    .msg.recv { align-self: flex-start; }
+
+    .msg-bub {
+      padding: 9px 13px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .msg.sent .msg-bub { background: var(--green-dark); color: #fff; border-bottom-right-radius: 3px; }
+    .msg.recv .msg-bub { background: var(--white); border: 1px solid var(--border); color: var(--text-dark); border-bottom-left-radius: 3px; }
+    .msg-time { font-size: 10px; color: #aaa; margin-top: 3px; }
+
+    .rdv-mini {
+      background: var(--green-pale);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 9px 12px;
+      font-size: 12px;
+      margin: 2px 0;
+    }
+    .rdv-mini strong { color: var(--green-dark); display: block; margin-bottom: 2px; }
+    .rdv-mini span   { color: var(--text-muted); }
+
+    .chat-inp-area {
+      padding: 11px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 9px;
+      align-items: center;
+      background: var(--white);
+    }
+
+    .chat-input {
+      flex: 1;
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 9px 13px;
+      font-size: 13px;
+      color: var(--text-dark);
+      outline: none;
+      font-family: 'Inter', sans-serif;
+      transition: border-color .15s;
+    }
+    .chat-input:focus { border-color: var(--green-soft); }
+    .chat-input::placeholder { color: var(--text-muted); }
+
+    .send-btn {
+      width: 38px; height: 38px;
+      background: var(--green-dark);
+      border: none;
+      border-radius: 9px;
+      color: #fff;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+      flex-shrink: 0;
+    }
+    .send-btn:hover { background: var(--green-mid); }
+
+    /* ── EMAILS ── */
+    .email-wrap { padding: 20px 24px; background: var(--cream); }
+
+    .email-type-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+
+    .etab {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: var(--white);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all .14s;
+      font-family: 'Inter', sans-serif;
+    }
+    .etab:hover { color: var(--text-dark); }
+    .etab.active { background: var(--green-dark); color: #fff; border-color: var(--green-dark); }
+
+    .email-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .email-hd {
+      background: var(--green-dark);
+      padding: 18px 22px;
+      display: flex; align-items: center; gap: 13px;
+    }
+    .email-logo-box {
+      width: 42px; height: 42px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .email-brand {
+      font-size: 16px; font-weight: 700;
+      font-family: 'Playfair Display', serif;
+    }
+    .email-brand .w { color: #fff; }
+    .email-brand .o { color: var(--orange); }
+    .email-tagline { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+    .email-body { padding: 20px 22px; }
+    .e-greeting { font-size: 15px; font-weight: 600; color: var(--text-dark); margin-bottom: 8px; }
+    .e-text     { font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 12px; }
+
+    .rdv-box {
+      background: var(--green-pale);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin: 12px 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .rdv-f label { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); display: block; margin-bottom: 2px; }
+    .rdv-f span  { font-size: 14px; font-weight: 600; color: var(--text-dark); }
+
+    .e-actions { display: flex; gap: 10px; margin-top: 14px; }
+    .e-btn {
+      flex: 1; padding: 10px;
+      border-radius: 9px;
+      font-size: 13px; font-weight: 600;
+      text-align: center;
+      cursor: pointer; border: none;
+      font-family: 'Inter', sans-serif;
+      transition: opacity .14s;
+    }
+    .e-btn:hover { opacity: .85; }
+    .e-btn.prim { background: var(--green-dark); color: #fff; }
+    .e-btn.sec  { background: var(--cream-dark); color: var(--text-muted); border: 1px solid var(--border); }
+
+    /* ── HISTORIQUE ── */
+    .hist-filters {
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex; gap: 7px; flex-wrap: wrap;
+      background: var(--white);
+    }
+    .filt {
+      padding: 5px 13px;
+      border-radius: 20px;
+      font-size: 12px; font-weight: 500;
+      border: 1px solid var(--border);
+      background: var(--white);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all .14s;
+      font-family: 'Inter', sans-serif;
+    }
+    .filt:hover { color: var(--text-dark); border-color: #adc8b4; }
+    .filt.active { background: var(--green-dark); color: #fff; border-color: var(--green-dark); }
+
+    .hist-table { width: 100%; border-collapse: collapse; }
+    .hist-table th {
+      padding: 10px 22px;
+      text-align: left;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: .07em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      text-transform: uppercase;
+      background: var(--cream);
+    }
+    .hist-table td {
+      padding: 12px 22px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--green-pale);
+      vertical-align: middle;
+      background: var(--white);
+    }
+    .hist-table tr:hover td { background: var(--green-pale); }
+
+    .spill {
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: .02em;
+    }
+    .s-lu   { background: var(--green-light); color: var(--green-dark); }
+    .s-env  { background: var(--blue-bg);     color: var(--blue); }
+    .s-fail { background: var(--red-bg);      color: var(--red); }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 28px; right: 28px;
+      background: var(--green-dark);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all .3s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .chat-layout { grid-template-columns: 1fr; height: auto; }
+      .chat-side   { display: none; }
+      .rdv-box     { grid-template-columns: 1fr; }
+      nav          { padding: 0 16px; }
+      .page        { padding: 20px 12px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <div class="logo"><span>Serv</span><span class="orange">Easy</span></div>
+    <div class="nav-links">
+      <a href="#">Accueil</a>
+      <a href="#">Catalogue</a>
+      <a href="#" class="active">Notifications</a>
+      <button class="nav-notif-btn" onclick="showToast('4 nouvelles notifications')">
+        🔔<span class="dot"></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- PAGE -->
+  <div class="page">
+    <div class="page-title">Notifications & Communication</div>
+    <div class="page-sub">Gérez vos alertes, messages et emails en un seul endroit.</div>
+
+    <div class="card">
+
+      <!-- EN-TÊTE -->
+      <div class="sec-header">
+        <div class="sec-icon">🔔</div>
+        <div>
+          <div class="sec-title">Centre de communication</div>
+          <div class="sec-sub">Tout ce qui tient vos utilisateurs informés</div>
+        </div>
+      </div>
+
+      <!-- ONGLETS -->
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('notifs', this)">Notifications <span class="badge" id="notif-count">4</span></button>
+        <button class="tab" onclick="switchTab('messages', this)">Messagerie</button>
+        <button class="tab" onclick="switchTab('emails', this)">Emails & Rappels</button>
+        <button class="tab" onclick="switchTab('hist', this)">Historique</button>
+      </div>
+
+      <!-- ═══ NOTIFICATIONS ═══ -->
+      <div id="tab-notifs" class="tab-content active">
+
+        <div id="notif-list">
+          <!-- Les notifications sont injectées par JS (ou par le back-end via fetch) -->
+        </div>
+
+      </div>
+
+      <!-- ═══ MESSAGERIE ═══ -->
+      <div id="tab-messages" class="tab-content">
+        <div class="chat-layout">
+
+          <div class="chat-side">
+            <div class="chat-search">
+              <input type="text" id="conv-search" placeholder="Rechercher un prestataire..." oninput="filterConvs(this.value)">
+            </div>
+            <div id="conv-list"></div>
+          </div>
+
+          <div class="chat-main">
+            <div class="chat-top">
+              <div style="font-size:22px;" id="chat-ava">🧹</div>
+              <div style="flex:1;">
+                <div class="chat-top-name" id="chat-name">Awa Diallo</div>
+                <div class="chat-top-role" id="chat-role">Ménage domicile</div>
+              </div>
+              <div class="online-status">En ligne</div>
+            </div>
+
+            <div class="chat-msgs" id="chat-msgs"></div>
+
+            <div class="chat-inp-area">
+              <input type="text" class="chat-input" id="msg-inp" placeholder="Votre message..."
+                onkeydown="if(event.key==='Enter') sendMsg()">
+              <button class="send-btn" onclick="sendMsg()">➤</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ EMAILS ═══ -->
+      <div id="tab-emails" class="tab-content">
+        <div class="email-wrap">
+          <div class="email-type-tabs">
+            <button class="etab active" onclick="showEmail('confirm', this)">Confirmation</button>
+            <button class="etab" onclick="showEmail('rappel', this)">Rappel J-1</button>
+            <button class="etab" onclick="showEmail('annul', this)">Annulation</button>
+          </div>
+
+          <!-- Confirmation -->
+          <div class="email-card" id="email-confirm">
+            <div class="email-hd">
+              <div class="email-logo-box">📅</div>
+              <div>
+                <div class="email-brand"><span class="w">Serv</span><span class="o">Easy</span></div>
+                <div class="email-tagline">Votre plateforme de réservation au Cameroun</div>
+              </div>
+            </div>
+            <div class="email-body">
+              <div class="e-greeting">Bonjour Fatima 👋</div>
+              <div class="e-text">Votre rendez-vous a bien été réservé. Retrouvez les détails ci-dessous :</div>
+              <div class="rdv-box">
+                <div class="rdv-f"><label>Prestataire</label><span>Dr. Amina Fouda</span></div>
+                <div class="rdv-f"><label>Service</label><span>🦷 Dentiste</span></div>
+                <div class="rdv-f"><label>Date</label><span>14 avril 2025</span></div>
+                <div class="rdv-f"><label>Heure</label><span>09h30</span></div>
+              </div>
+              <div class="e-text">Vous pouvez modifier ou annuler gratuitement jusqu'à 24h avant le rendez-vous.</div>
+              <div class="e-actions">
+                <button class="e-btn prim" onclick="showToast('Redirection vers votre réservation...')">Voir ma réservation</button>
+                <button class="e-btn sec"  onclick="showToast('Réservation annulée')">Annuler</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rappel -->
+          <div class="email-card" id="email-rappel" style="display:none;">
+            <div class="email-hd">
+              <div class="email-logo-box">⏰</div>
+              <div>
+                <div class="email-brand"><span class="w">Serv</span><span class="o">Easy</span></div>
+                <div class="email-tagline">Rappel de rendez-vous</div>
+              </div>
+            </div>
+            <div class="email-body">
+              <div class="e-greeting">Rappel — Demain à 09h30 🔔</div>
+              <div class="e-text">N'oubliez pas votre rendez-vous demain matin avec Dr. Amina Fouda (Dentiste). Arrivez 5 min avant et pensez à votre carnet de santé.</div>
+              <div class="rdv-box">
+                <div class="rdv-f"><label>Adresse</label><span>Av. Kennedy, Yaoundé</span></div>
+                <div class="rdv-f"><label>Durée estimée</label><span>45 minutes</span></div>
+              </div>
+              <div class="e-actions">
+                <button class="e-btn prim" onclick="showToast('Ouverture de l\'itinéraire...')">Voir l'itinéraire</button>
+                <button class="e-btn sec"  onclick="showToast('Modification en cours...')">Modifier</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Annulation -->
+          <div class="email-card" id="email-annul" style="display:none;">
+            <div class="email-hd" style="background:#8B1A1A;">
+              <div class="email-logo-box">❌</div>
+              <div>
+                <div class="email-brand"><span class="w">Serv</span><span class="o">Easy</span></div>
+                <div class="email-tagline" style="color:rgba(255,255,255,0.5);">Réservation annulée</div>
+              </div>
+            </div>
+            <div class="email-body">
+              <div class="e-greeting">Désolé Fatima 😔</div>
+              <div class="e-text">Votre réservation avec Jean-Paul (Chauffeur) du 12 avril a été annulée. Un remboursement complet a été initié sous 3–5 jours ouvrés.</div>
+              <div class="e-actions">
+                <button class="e-btn prim" onclick="showToast('Recherche d\'un autre chauffeur...')">Trouver un autre chauffeur</button>
+                <button class="e-btn sec"  onclick="showToast('Support contacté')">Contacter le support</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ HISTORIQUE ═══ -->
+      <div id="tab-hist" class="tab-content">
+        <div class="hist-filters">
+          <button class="filt active" onclick="filtHist('all',this)">Tout</button>
+          <button class="filt" onclick="filtHist('confirmed',this)">Confirmés</button>
+          <button class="filt" onclick="filtHist('reminder',this)">Rappels</button>
+          <button class="filt" onclick="filtHist('message',this)">Messages</button>
+          <button class="filt" onclick="filtHist('cancelled',this)">Annulés</button>
+        </div>
+        <table class="hist-table">
+          <thead>
+            <tr>
+              <th>Service</th>
+              <th>Type</th>
+              <th>Destinataire</th>
+              <th>Date</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody id="hist-body"></tbody>
+        </table>
+      </div>
+
+    </div><!-- /card -->
+  </div><!-- /page -->
+
+  <!-- TOAST -->
+  <div id="toast"></div>
+
+  <script>
+    /* ════════════════════════════════════════════
+       DONNÉES (seront remplacées par fetch() API)
+    ════════════════════════════════════════════ */
+    const NOTIFS = [
+      { id:1, type:'confirmed', icon:'🦷', iconBg:'#E8F5EE', dotColor:'#52B788',
+        title:'Dr. Amina Fouda — Dentiste', desc:'Votre RDV du 14 avril à 09h30 est confirmé. Pensez à apporter votre carnet de santé.', time:'Il y a 5 min · Yaoundé', unread:true },
+      { id:2, type:'reminder',  icon:'🔧', iconBg:'#EEF4FB', dotColor:'#2E6EA6',
+        title:'Paul Essomba — Plombier',   desc:'Intervention demain à 14h00 pour réparation fuite. Préparez l\'accès à la salle de bain.', time:'Il y a 2h · Douala', unread:true },
+      { id:3, type:'message',   icon:'💬', iconBg:'#FBF5E8', dotColor:null,
+        title:'Awa Diallo — Ménage',       desc:'« Bonjour, je serai là à 8h pile. Avez-vous des instructions particulières ? »', time:'Hier, 18h45 · Yaoundé', unread:false },
+      { id:4, type:'cancelled', icon:'🚗', iconBg:'#FDF0EE', dotColor:null,
+        title:'Jean-Paul — Chauffeur',     desc:'RDV du 12 avril annulé par le prestataire. Un remboursement a été initié.', time:'Il y a 1 jour · Buea', unread:false },
+    ];
+
+    const CONVS = [
+      { id:1, ava:'🧹', name:'Awa Diallo',       role:'Ménage domicile',   preview:'Bonjour, je serai là...', time:'18h45', unread:2,
+        msgs:[
+          { from:'recv', text:'Bonjour ! Je confirme notre RDV pour le ménage.',              time:'18h30' },
+          { from:'sent', rdv:'Ménage · Mercredi 13 avril · 08h00',                            time:'18h31' },
+          { from:'recv', text:'Je serai là à 8h pile. Avez-vous des instructions particulières ?', time:'18h45' },
+        ]},
+      { id:2, ava:'🦷', name:'Dr. Amina Fouda',  role:'Dentiste',           preview:'RDV confirmé pour le 14', time:'10h22', unread:0,
+        msgs:[
+          { from:'recv', text:'Bonjour, votre RDV du 14 avril à 09h30 est confirmé.', time:'10h22' },
+        ]},
+      { id:3, ava:'🔧', name:'Paul Essomba',      role:'Plombier',           preview:'Je serai là demain à 14h', time:'Hier', unread:0,
+        msgs:[
+          { from:'recv', text:'Bonjour, je confirme mon passage demain à 14h.', time:'Hier' },
+          { from:'sent', text:'Parfait merci !', time:'Hier' },
+        ]},
+    ];
+
+    const HIST_DATA = [
+      { svc:'🦷 Dentiste',   type:'confirmed', lbl:'Confirmation', dest:'fatima@email.com',  date:'11 avr, 09h15', st:'lu' },
+      { svc:'🔧 Plombier',  type:'reminder',  lbl:'Rappel J-1',   dest:'fatima@email.com',  date:'10 avr, 20h00', st:'env' },
+      { svc:'🧹 Ménage',    type:'message',   lbl:'Message',      dest:'In-app',             date:'10 avr, 18h45', st:'lu' },
+      { svc:'🚗 Chauffeur', type:'cancelled', lbl:'Annulation',   dest:'fatima@email.com',  date:'09 avr, 14h22', st:'lu' },
+      { svc:'💆 Spa',       type:'confirmed', lbl:'Confirmation', dest:'fatima@email.com',  date:'08 avr, 11h30', st:'lu' },
+      { svc:'🏥 Médecin',   type:'reminder',  lbl:'Rappel J-1',   dest:'SMS +237 6XX XXX',  date:'07 avr, 09h00', st:'fail'},
+    ];
+
+    let currentConvId = 1;
+
+    /* ════════════════════════════════════════════
+       RENDU NOTIFICATIONS
+    ════════════════════════════════════════════ */
+    function renderNotifs() {
+      const list = document.getElementById('notif-list');
+      list.innerHTML = NOTIFS.map(n => `
+        <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="markRead(${n.id}, this)">
+          <div class="notif-ava" style="background:${n.iconBg};">
+            ${n.icon}
+            ${n.dotColor ? `<span class="dot" style="background:${n.dotColor};"></span>` : ''}
+          </div>
+          <div class="notif-body">
+            <div class="notif-title">
+              <span class="ntag ${tagClass(n.type)}">${tagLabel(n.type)}</span>
+              ${n.title}
+            </div>
+            <div class="notif-desc">${n.desc}</div>
+            <div class="notif-time">${n.time}</div>
+          </div>
+        </div>`).join('');
+    }
+
+    function tagClass(type) {
+      return { confirmed:'t-ok', cancelled:'t-no', reminder:'t-rem', message:'t-msg' }[type] || 't-msg';
+    }
+
+    function tagLabel(type) {
+      return { confirmed:'✓ Confirmé', cancelled:'✕ Annulé', reminder:'⏰ Rappel', message:'💬 Message' }[type] || type;
+    }
+
+    function markRead(id, el) {
+      const n = NOTIFS.find(x => x.id === id);
+      if (n && n.unread) {
+        n.unread = false;
+        el.classList.remove('unread');
+        const cnt = NOTIFS.filter(x => x.unread).length;
+        document.getElementById('notif-count').textContent = cnt;
+        /* En production : fetch('/api/notifications/' + id + '/read', { method:'PATCH' }) */
+      }
+    }
+
+    /* ════════════════════════════════════════════
+       RENDU MESSAGERIE
+    ════════════════════════════════════════════ */
+    function renderConvList(filter = '') {
+      const list = document.getElementById('conv-list');
+      const convs = CONVS.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()));
+      list.innerHTML = convs.map(c => `
+        <div class="conv ${c.id === currentConvId ? 'active' : ''}" onclick="selectConv(${c.id})">
+          <div class="conv-ava">${c.ava}</div>
+          <div style="flex:1;min-width:0;">
+            <div class="conv-name">${c.name}</div>
+            <div class="conv-prev">${c.preview}</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="conv-time">${c.time}</div>
+            ${c.unread > 0 ? `<div class="conv-unread">${c.unread}</div>` : ''}
+          </div>
+        </div>`).join('');
+    }
+
+    function filterConvs(v) { renderConvList(v); }
+
+    function selectConv(id) {
+      currentConvId = id;
+      const c = CONVS.find(x => x.id === id);
+      c.unread = 0;
+      document.getElementById('chat-ava').textContent  = c.ava;
+      document.getElementById('chat-name').textContent = c.name;
+      document.getElementById('chat-role').textContent = c.role;
+      renderConvList(document.getElementById('conv-search').value);
+      renderMsgs(c.msgs);
+      /* En production : fetch('/api/conversations/' + id + '/messages') */
+    }
+
+    function renderMsgs(msgs) {
+      const box = document.getElementById('chat-msgs');
+      box.innerHTML = msgs.map(m => {
+        if (m.rdv) return `
+          <div class="msg sent">
+            <div class="rdv-mini"><strong>📅 Réservation confirmée</strong><span>${m.rdv}</span></div>
+            <div class="msg-time">${m.time}</div>
+          </div>`;
+        return `
+          <div class="msg ${m.from}">
+            <div class="msg-bub">${m.text}</div>
+            <div class="msg-time">${m.time}</div>
+          </div>`;
+      }).join('');
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function sendMsg() {
+      const inp  = document.getElementById('msg-inp');
+      const text = inp.value.trim();
+      if (!text) return;
+
+      const conv = CONVS.find(x => x.id === currentConvId);
+      const time = new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+      conv.msgs.push({ from:'sent', text, time });
+      conv.preview = text;
+      inp.value = '';
+      renderMsgs(conv.msgs);
+      renderConvList(document.getElementById('conv-search').value);
+
+      /* ── Appel API back-end ──
+         fetch('/api/messages', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({ conversationId: currentConvId, text })
+         });
+      */
+
+      // Réponse auto simulée (à retirer en production)
+      setTimeout(() => {
+        conv.msgs.push({ from:'recv', text:'Message bien reçu, merci ! 👍', time });
+        renderMsgs(conv.msgs);
+      }, 1200);
+    }
+
+    /* ════════════════════════════════════════════
+       EMAILS
+    ════════════════════════════════════════════ */
+    function showEmail(type, btn) {
+      document.querySelectorAll('.etab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      ['confirm','rappel','annul'].forEach(t =>
+        document.getElementById('email-' + t).style.display = t === type ? 'block' : 'none'
+      );
+    }
+
+    /* ════════════════════════════════════════════
+       HISTORIQUE
+    ════════════════════════════════════════════ */
+    function renderHist(filter) {
+      const rows = filter === 'all' ? HIST_DATA : HIST_DATA.filter(r => r.type === filter);
+      document.getElementById('hist-body').innerHTML = rows.map(r => `
+        <tr>
+          <td>${r.svc}</td>
+          <td><span class="ntag ${tagClass(r.type)}">${r.lbl}</span></td>
+          <td style="font-size:12px;color:var(--text-muted);">${r.dest}</td>
+          <td style="font-size:12px;color:var(--text-muted);">${r.date}</td>
+          <td><span class="spill ${r.st==='lu'?'s-lu':r.st==='env'?'s-env':'s-fail'}">
+            ${r.st==='lu'?'Lu':r.st==='env'?'Envoyé':'Échoué'}
+          </span></td>
+        </tr>`).join('');
+    }
+
+    function filtHist(type, btn) {
+      document.querySelectorAll('.hist-filters .filt').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderHist(type);
+    }
+
+    /* ════════════════════════════════════════════
+       ONGLETS
+    ════════════════════════════════════════════ */
+    function switchTab(id, el) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('tab-' + id).classList.add('active');
+    }
+
+    /* ════════════════════════════════════════════
+       TOAST
+    ════════════════════════════════════════════ */
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    /* ════════════════════════════════════════════
+       INIT
+    ════════════════════════════════════════════ */
+    renderNotifs();
+    renderConvList();
+    selectConv(1);
+    renderHist('all');
+
+    /*
+    ══════════════════════════════════════════════
+    EN PRODUCTION — remplacez les données statiques
+    par des appels API comme ceci :
+
+    async function loadNotifs() {
+      const res  = await fetch('/api/notifications', {
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+      });
+      const data = await res.json();
+      // data.notifications → remplir NOTIFS et appeler renderNotifs()
+    }
+
+    loadNotifs();
+    ══════════════════════════════════════════════
+    */
+  </script>
+</body>
+</html>
