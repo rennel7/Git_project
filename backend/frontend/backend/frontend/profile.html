@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profil</title>
+
+<style>
+body{
+font-family:Arial;
+background:#f4f4f4;
+}
+
+.profile{
+background:white;
+width:400px;
+margin:50px auto;
+padding:20px;
+border-radius:10px;
+text-align:center;
+box-shadow:0 0 10px gray;
+}
+</style>
+</head>
+
+<body>
+
+<div class="profile">
+<h2>Mon Profil</h2>
+<div id="info">Chargement...</div>
+</div>
+
+<script>
+const token = localStorage.getItem("token");
+
+if(!token){
+alert("Non connecté");
+window.location.href="login.html";
+}
+
+fetch("http://localhost:3000/profile",{
+headers:{
+Authorization:"Bearer "+token
+}
+})
+.then(res=>res.json())
+.then(data=>{
+document.getElementById("info").innerHTML=`
+<p><b>Nom:</b> ${data.name}</p>
+<p><b>Email:</b> ${data.email}</p>
+<p><b>Rôle:</b> ${data.role}</p>
+`;
+});
+</script>
+
+</body>
+</html>
